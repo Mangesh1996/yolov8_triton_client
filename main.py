@@ -1,13 +1,12 @@
 import cv2
 import numpy as np
 from trion_utils import Detection_prediction
-import torch
 import os
 
-def inference(path,labels_name,save):
+def inference(path,labels_path,save):
+    labels_name=label_read(labels_path)
     for file_index,filename in enumerate(os.listdir(path)):
-        if filename.endswith('.jpg'):
-            
+        if filename.endswith('.jpg'):            
             image_path=path+"/"+filename
             # Load your image
             orig_img = cv2.imread(image_path)
@@ -38,23 +37,23 @@ def inference(path,labels_name,save):
                 
                     # Modify the parameters to put the label inside the detection box
                     cv2.putText(orig_img, label, (int(box[0] ), int(box[1] + label_size[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
-                    if save:
-                        save_path=os.path.join(os.getcwd(),"output")
-                        os.makedirs(save_path,exist_ok=True)
-                        cv2.imwrite(os.path.join(os.getcwd(),"output",filename),orig_img)
-                    else:
-                        # Display the image
-                        cv2.imshow(filename, orig_img)
-                        cv2.waitKey(0)
-                        cv2.destroyAllWindows()
+                else:
+                    continue
+                if save:
+                    save_path=os.path.join(os.getcwd(),"output")
+                    os.makedirs(save_path,exist_ok=True)
+                    cv2.imwrite(os.path.join(os.getcwd(),"output",filename),orig_img)
+                else:
+                    # Display the image
+                    cv2.imshow(filename, orig_img)
+                    cv2.waitKey(0)
+                    cv2.destroyAllWindows()
 
-def label_read():
-    
-    with open("/home/easemyai/Documents/Desktop_Items/nvidia_triton_server/trion_work/trion_server/triton_clients_onnx/labels.txt","r") as f:
-        lines=f.readlines()
-        print(lines)
-        return [line[:-1].split(",")[0] for line in lines]
-print(label_read())   
-# if __name__=="__main__":
-#     labels_name={0:"helment",1:"vest",2:"head",3:"person"} 
-#     inference("/home/easemyai/Music/telegram_bot_data/data",labels_name,save=True)
+def label_read(labels_path):    
+    with open(labels_path,"r") as f:
+        labels=f.readlines()
+        labels= {i:label.strip() for i,label in enumerate(labels)}
+        return labels 
+if __name__=="__main__":
+    labels_path=os.path.join(os.getcwd(),"labels.txt")
+    inference("images",labels_path,save=False)
