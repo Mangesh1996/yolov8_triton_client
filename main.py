@@ -2,8 +2,24 @@ import cv2
 import numpy as np
 from trion_utils import Detection_prediction
 import os
-
+import gdown
+import zipfile
+def download_model():
+    if not os.path.exists("model_respository"):
+        print('Creating model repository')
+        os.makedirs("model_repository")
+        url="https://drive.usercontent.google.com/download?id=1ERMb5zpM620C_cB9HvtVduUtN-kAdFlQ&export=download&authuser=0&confirm=t&uuid=1a066ffe-6192-4919-adbe-6252497c2d73&at=APZUnTXixonXW1DWI3nlT-CP9wpN:1699619836338"
+        output="model_repository/safety_kit.zip"
+        gdown.download(url, output, quiet=False)
+        with zipfile.ZipFile(output,'r') as zip_ref:
+            zip_ref.extractall("model_repository")
+        os.remove(output)
+        print('Model downloaded successfully!')
+    else:
+        print('Model already exists in the repository')
+    
 def inference(path,labels_path,save):
+    download_model()
     labels_name=label_read(labels_path)
     for file_index,filename in enumerate(os.listdir(path)):
         if filename.endswith('.jpg'):            
@@ -57,3 +73,4 @@ def label_read(labels_path):
 if __name__=="__main__":
     labels_path=os.path.join(os.getcwd(),"labels.txt")
     inference("images",labels_path,save=False)
+    
