@@ -5,9 +5,9 @@ import os
 import gdown
 import zipfile
 def download_model():
-    if not os.path.exists("model_respository"):
+    if not os.path.exists(os.path.join(os.getcwd(),"model_repository")):
         print('Creating model repository')
-        os.makedirs("model_repository")
+        os.makedirs(os.path.join(os.getcwd(),"model_repository"),exist_ok=True)
         url="https://drive.usercontent.google.com/download?id=1ERMb5zpM620C_cB9HvtVduUtN-kAdFlQ&export=download&authuser=0&confirm=t&uuid=1a066ffe-6192-4919-adbe-6252497c2d73&at=APZUnTXixonXW1DWI3nlT-CP9wpN:1699619836338"
         output="model_repository/safety_kit.zip"
         gdown.download(url, output, quiet=False)
@@ -15,8 +15,7 @@ def download_model():
             zip_ref.extractall("model_repository")
         os.remove(output)
         print('Model downloaded successfully!')
-    else:
-        print('Model already exists in the repository')
+    
     
 def inference(path,labels_path,save):
     download_model()
@@ -55,15 +54,15 @@ def inference(path,labels_path,save):
                     cv2.putText(orig_img, label, (int(box[0] ), int(box[1] + label_size[1])), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 else:
                     continue
-                if save:
-                    save_path=os.path.join(os.getcwd(),"output")
-                    os.makedirs(save_path,exist_ok=True)
-                    cv2.imwrite(os.path.join(os.getcwd(),"output",filename),orig_img)
-                else:
-                    # Display the image
-                    cv2.imshow(filename, orig_img)
-                    cv2.waitKey(0)
-                    cv2.destroyAllWindows()
+            if save:
+                save_path=os.path.join(os.getcwd(),"output")
+                os.makedirs(save_path,exist_ok=True)
+                cv2.imwrite(os.path.join(os.getcwd(),"output",filename),orig_img)
+            else:
+                # Display the image
+                cv2.imshow(filename, orig_img)
+                cv2.waitKey(0)
+                cv2.destroyAllWindows()
 
 def label_read(labels_path):    
     with open(labels_path,"r") as f:
@@ -72,5 +71,5 @@ def label_read(labels_path):
         return labels 
 if __name__=="__main__":
     labels_path=os.path.join(os.getcwd(),"labels.txt")
-    inference("images",labels_path,save=False)
+    inference("images",labels_path,save=True)
     
